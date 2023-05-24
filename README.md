@@ -1,116 +1,110 @@
-# notes
-
-First, let's create the server and client files for the networking part of the program in Debian. I recommend using the `nano` editor which comes pre-installed with Debian. To create the files, open the terminal and navigate to the folder you created. Use the following commands:
-
-```bash
-nano server.py  # creates and opens server.py file in nano
-```
-
-Add the following server code inside the `server.py` file:
-
-```python
 import socket
-import sys
-from lottery_ticket_generator import LotteryTicketGenerator, parse_arguments
+from lottery_ticket_generator import LotteryTicketGenerator
 
-def handle_client_connection(client_socket, address): # (1)
-    data = client_socket.recv(1024)
-    ticket_data = data.decode("utf-8")
-    ticket_type, ticket_count = ticket_data.split(",") # (2)
+
+def process_client_request(data):
+    ticket_type, number_of_tickets = data.split()
     generator = LotteryTicketGenerator(ticket_type)
-    tickets = [generator.generate_ticket() for _ in range(int(ticket_count))]
-    response = ";".join(",".join(str(num) for num in ticket) for ticket in tickets)
-    client_socket.sendall(response.encode("utf-8")) # (3)
+    tickets = [generator.generate_ticket() for _ in range(int(number_of_tickets))]
+    return tickets
 
-def run_server(port):
+
+def main():
+    HOST = '127.0.0.1'
+    PORT = 5000
+
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(("", port))
-    server_socket.listen(5)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen(1)
 
-    print(f"Server listening on port {port}")
+    print(f"Listening on {HOST}:{PORT}...")
 
     while True:
-        client_socket, address = server_socket.accept()
-        print(f"Host {address[0]} connected.")
-        handle_client_connection(client_socket, address)
+        client_socket, client_address = server_socket.accept()
+        print(f"Accepted connection from {client_address}")
+
+        data = client_socket.recv(1024).decode()
+        tickets = process_client_request(data)
+
+        for ticket in tickets:
+            response = ','.join(str(num) for num in ticket) + '\n'
+            client_socket.sendall(response.encode())
+
         client_socket.close()
-        print(f"Host {address[0]} disconnected.")
+        print(f"Closed connection from {client_address}")
+
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Error: Please provide a port number.")
-        sys.exit(1)
-
-    port = int(sys.argv[1])
-    run_server(port)
-```
-
-Explanation of the server code:
-
-1. This function takes client socket and address as input. It receives the data sent by the client and processes it.
-2. It then saves the ticket type and ticket count received from the client.
-3. Sends the generated ticket back to the client.
-
-Now, create the `client.py` file:
-
-```bash
-nano client.py  # creates and opens client.py file in nano
-```
-
-Add the following client code inside the `client.py` file:
-
-```python
+    main()
+    
+    
+    
+    
+   
+ //`/   /// /   //  //  //  //  //  /// //  //  //  //  //  //
+ 
+ import argparse
 import socket
-import sys
-from lottery_ticket_generator import parse_arguments
 
-def request_tickets(server_address, port, ticket_type, ticket_count):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((server_address, port))
 
-    data = f"{ticket_type},{ticket_count}".encode("utf-8")
-    client_socket.sendall(data)
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Lottery Ticket Client")
+    parser.add_argument("ticket_type", choices=[
+                        "type1", "type2", "type3"], help="Type of lottery ticket to request")
+    parser.add_argument("-n", "--number_of_tickets", type=int,
+                        default=1, help="Number of tickets to request")
+    parser.add_argument("--host", default="127.0.0.1",
+                        help="Host address of the server")
+    parser.add_argument("--port", type=int, default=5000,
+                        help="Port number to use for connection")
+    args = parser.parse_args()
+    
+    if args.number_of_tickets < 1:
+        print("Error: The number of tickets must be at least 1.")
+        sys.exit(1)
+    
+    return args
 
-    response = client_socket.recv(1024)
-    tickets = response.decode("utf-8").split(";")
-    tickets = [ticket.split(",") for ticket in tickets]
-
-    client_socket.close()
-    return tickets
 
 def main():
     args = parse_arguments()
-    server_address = "127.0.0.1"  # Update this with the correct server address
-    port = 8000  # Update this with the correct port number
-
+    host = args.host
+    port = args.port
     ticket_type = args.ticket_type
-    ticket_count = args.number_of_tickets
-    output_file = args.output_file
+    number_of_tickets = args.number_of_tickets
 
-    tickets = request_tickets(server_address, port, ticket_type, ticket_count)
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
 
-    for ticket in tickets:
-        print(ticket)
+    request = f"{ticket_type} {number_of_tickets}"
+    client_socket.sendall(request.encode())
 
-    if output_file:
-        try:
-            with open(output_file, "w") as file:
-                for ticket in tickets:
-                    file.write(",".join(ticket))
-                    file.write("\n")
-        except Exception as e:
-            print(
-                f"Error: Could not write to the output file. Details: {str(e)}")
-            sys.exit(1)
+    received_data = []
+    while True:
+        data = client_socket.recv(1024)
+        if not data:
+            break
+        received_data.append(data.decode())
+
+    client_socket.close()
+
+    print("Received tickets:")
+    for ticket_data in ''.join(received_data).split('\n')[:-1]:
+        print(ticket_data)
 
 if __name__ == "__main__":
     main()
 ```
 
-After writing the code in both files, press `Ctrl+X` to exit, followed by `Y` to save the changes, and lastly `Enter` to finish.
+To test the client and server scripts, open two terminal windows.
 
-To run the server, open a terminal and navigate to the folder containing `server.py`, then type: `python3 server.py 8000` (Replace "8000" with any other port number if necessary).
+In the first window, run the server script:
 
-To run the client, open a new terminal and navigate to the folder containing `client.py`, then type: `python3 client.py type1 -n 5` (Change "type1" and "5" to the desired ticket type and quantity).
+```
+python3 server.py
+```
 
-This is a basic implementation of the server and client for the networked lottery ticket generator. There are various improvements you can make based on your requirements, like adding error handling, or implementing switch cases for IPv6, etc.
+In the second window, run the client script:
+
+```
+python3 client.py type1 -n 5
