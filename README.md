@@ -1,38 +1,48 @@
 import socket
+import sys
 from lottery_ticket_generator import LotteryTicketGenerator
 
-
-def process_client_request(data):
-    ticket_type, number_of_tickets = data.split()
+def generate_tickets(ticket_type, num_tickets):
     generator = LotteryTicketGenerator(ticket_type)
-    tickets = [generator.generate_ticket() for _ in range(int(number_of_tickets))]
+    tickets = []
+
+    for _ in range(num_tickets):
+        ticket = generator.generate_ticket()
+        tickets.append(ticket)
+
     return tickets
 
-
 def main():
-    HOST = '127.0.0.1'
-    PORT = 5000
+    host = "::1"
+    port = int(input("Enter the socket number to start the server: "))
+    
+    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    server_address = (host, port)
 
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((HOST, PORT))
-    server_socket.listen(1)
+    sock.bind(server_address)
+    sock.listen(1)
 
-    print(f"Listening on {HOST}:{PORT}...")
+    print(f'Server is running on {host}, port {port}')
 
-    while True:
-        client_socket, client_address = server_socket.accept()
-        print(f"Accepted connection from {client_address}")
+    try:
+        while True:
+            print('Waiting for an incoming connection...')
+            connection, client_address = sock.accept()
+            print(f'Connection from {client_address}')
+            data = connection.recv(1024).decode().strip().split(',')
+            ticket_type, num_tickets, unique_id = data
 
-        data = client_socket.recv(1024).decode()
-        tickets = process_client_request(data)
+            tickets = generate_tickets(ticket_type, int(num_tickets))
+            response = f"{unique_id}-{tickets}"
+            connection.sendall(response.encode())
 
-        for ticket in tickets:
-            response = ','.join(str(num) for num in ticket) + '\n'
-            client_socket.sendall(response.encode())
+            connection.close()
+            print('Connection closed.')
 
-        client_socket.close()
-        print(f"Closed connection from {client_address}")
-
+    except KeyboardInterrupt:
+        print("Shutting down the server.")
+        sock.close()
+        sys.exit()
 
 if __name__ == "__main__":
     main()
@@ -40,71 +50,40 @@ if __name__ == "__main__":
     
     
     
+    
+   #
    
- //`/   /// /   //  //  //  //  //  /// //  //  //  //  //  //
- 
- import argparse
-import socket
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Lottery Ticket Client")
-    parser.add_argument("ticket_type", choices=[
-                        "type1", "type2", "type3"], help="Type of lottery ticket to request")
-    parser.add_argument("-n", "--number_of_tickets", type=int,
-                        default=1, help="Number of tickets to request")
-    parser.add_argument("--host", default="127.0.0.1",
-                        help="Host address of the server")
-    parser.add_argument("--port", type=int, default=5000,
-                        help="Port number to use for connection")
-    args = parser.parse_args()
-    
-    if args.number_of_tickets < 1:
-        print("Error: The number of tickets must be at least 1.")
-        sys.exit(1)
-    
-    return args
-
+   import socket
+import sys
 
 def main():
-    args = parse_arguments()
-    host = args.host
-    port = args.port
-    ticket_type = args.ticket_type
-    number_of_tickets = args.number_of_tickets
+    host = "::1"
+    port = int(input("Enter the server's socket number: "))
+    ticket_type = input("Enter the desired ticket type (type1, type2, or type3): ")
+    num_tickets = int(input("Enter the number of tickets to generate: "))
+    unique_id = input("Enter a unique identifier or leave it empty: ")
+    if not unique_id:
+        unique_id = "default"
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
+    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 
-    request = f"{ticket_type} {number_of_tickets}"
-    client_socket.sendall(request.encode())
+    server_address = (host, port)
+    sock.connect(server_address)
 
-    received_data = []
-    while True:
-        data = client_socket.recv(1024)
-        if not data:
-            break
-        received_data.append(data.decode())
+    request = f"{ticket_type},{num_tickets},{unique_id}"
+    sock.sendall(request.encode())
 
-    client_socket.close()
+    received_data = sock.recv(1024).decode()
+    unique_id, tickets = received_data.split("-")
 
-    print("Received tickets:")
-    for ticket_data in ''.join(received_data).split('\n')[:-1]:
-        print(ticket_data)
+    print(f"Tickets received for unique_id '{unique_id}':")
+    print(tickets)
+
+    with open("tickets.txt", "a") as f:
+        f.write(tickets)
+        f.write("\n")
+
+    sock.close()
 
 if __name__ == "__main__":
     main()
-```
-
-To test the client and server scripts, open two terminal windows.
-
-In the first window, run the server script:
-
-```
-python3 server.py
-```
-
-In the second window, run the client script:
-
-```
-python3 client.py type1 -n 5
