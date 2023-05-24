@@ -1,3 +1,4 @@
+```python
 import socket
 import sys
 from lottery_ticket_generator import LotteryTicketGenerator
@@ -46,14 +47,12 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-    
-    
-    
-    
-   #
-   
-   import socket
+```
+
+3. Open `prototype_a_client.py` and add the following code for the interactive client:
+
+```python
+import socket
 import sys
 
 def main():
