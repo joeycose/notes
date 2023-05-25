@@ -1,9 +1,9 @@
-import argparse
-import random
-import socket
+    import argparse
+    import random
+    import socket
 
 
-class LotteryTicketGenerator:
+    class LotteryTicketGenerator:
     def __init__(self, ticket_type):
         self.ticket_type = ticket_type
         self.number_pool = self._initialize_number_pool()
@@ -26,13 +26,13 @@ class LotteryTicketGenerator:
         return sorted(ticket)
 
 
-def generate_ticket(ticket_type):
+    def generate_ticket(ticket_type):
     generator = LotteryTicketGenerator(ticket_type)
     ticket = generator.generate_ticket()
     return ",".join(str(num) for num in ticket) + "\n"
 
 
-def parse_arguments():
+    def parse_arguments():
     parser = argparse.ArgumentParser(description="Lottery Ticket Server")
     parser.add_argument("port", type=int, help="TCP port where the server will listen")
     args = parser.parse_args()
@@ -43,7 +43,7 @@ def parse_arguments():
     return args
 
 
-def serve_forever(port):
+    def serve_forever(port):
     server = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(("::", port))
@@ -64,10 +64,10 @@ def serve_forever(port):
         print(f"Client disconnected: {addr}")
 
 
-def main():
+    def main():
     args = parse_arguments()
     serve_forever(args.port)
 
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     main()
