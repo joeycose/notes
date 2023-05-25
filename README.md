@@ -4,41 +4,19 @@ import socket
 
 
 class LotteryTicketGenerator:
-    """
-    Class for generating lottery tickets based on the specified ticket type.
-    """
-
     def __init__(self, ticket_type):
-        """
-        Initialize the LotteryTicketGenerator object.
-
-        Parameters:
-            ticket_type (str): The type of lottery ticket to generate.
-        """
         self.ticket_type = ticket_type
         self.number_pool = self._initialize_number_pool()
 
     def _initialize_number_pool(self):
-        """
-        Initialize the number pool based on the ticket type.
-
-        Returns:
-            list: The number pool for the specified ticket type.
-        """
         if self.ticket_type == "type1":
-            return list(range(1, 50))  # Ticket type 1 has numbers from 1 to 49
+            return list(range(1, 50))
         elif self.ticket_type == "type2":
-            return list(range(1, 41))  # Ticket type 2 has numbers from 1 to 40
+            return list(range(1, 41))
         elif self.ticket_type == "type3":
-            return list(range(1, 60))  # Ticket type 3 has numbers from 1 to 59
+            return list(range(1, 60))
 
     def generate_ticket(self):
-        """
-        Generate a single lottery ticket.
-
-        Returns:
-            list: The generated lottery ticket.
-        """
         ticket = []
         pool = self.number_pool.copy()
         for _ in range(6):
