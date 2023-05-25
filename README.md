@@ -2,7 +2,6 @@ import argparse
 import random
 import socket
 
-
 class LotteryTicketGenerator:
     def __init__(self, ticket_type):
         self.ticket_type = ticket_type
