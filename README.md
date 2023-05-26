@@ -2,10 +2,31 @@ import random
 import socket
 
 class LotteryTicketGenerator:
-    # ... (Same as the previous prototypes) ...
+    def __init__(self, ticket_type):
+        self.ticket_type = ticket_type
+        self.number_pool = self._initialize_number_pool()
+
+    def _initialize_number_pool(self):
+        if self.ticket_type == "type1":
+            return list(range(1, 50))
+        elif self.ticket_type == "type2":
+            return list(range(1, 41))
+        elif self.ticket_type == "type3":
+            return list(range(1, 60))
+
+    def generate_ticket(self):
+        ticket = []
+        pool = self.number_pool.copy()
+        for _ in range(6):
+            index = random.randint(0, len(pool) - 1)
+            number = pool.pop(index)
+            ticket.append(number)
+        return sorted(ticket)
 
 def generate_ticket(ticket_type):
-    # ... (Same as the previous prototypes) ...
+    generator = LotteryTicketGenerator(ticket_type)
+    ticket = generator.generate_ticket()
+    return ",".join(str(num) for num in ticket) + "\n"
 
 def serve_forever(port):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
