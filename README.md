@@ -1,3 +1,8 @@
+I apologize for the confusion in my previous response. Below are the complete `prototype_c_server.py` and `prototype_c_client.py` files:
+
+**prototype_c_server.py:**
+
+```python
 import random
 import socket
 
@@ -54,8 +59,47 @@ def serve_forever(port):
         print(f"Client disconnected: {addr}")
 
 def main():
-    port = int(input("Enter the TCP port where the server will listen: "))
-    serve_forever(port)
+    fixed_port = 9999  # The fixed port number where the server will listen
+    serve_forever(fixed_port)
 
 if __name__ == "__main__":
     main()
+```
+
+**prototype_c_client.py:**
+
+```python
+import socket
+
+def request_ticket(ipv4_address, port, ticket_type, num_tickets):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ipv4_address, port))
+
+    client.send(f"{ticket_type} {num_tickets}".encode("utf-8"))
+
+    tickets = []
+    for _ in range(num_tickets):
+        ticket = client.recv(1024).decode("utf-8")
+        tickets.append(ticket)
+
+    client.close()
+
+    return tickets
+
+def main():
+    # Hard-coded arguments
+    ipv4_address = "127.0.0.1"
+    port = 9999
+    ticket_type = "type1"
+    num_tickets = 5
+
+    tickets = request_ticket(ipv4_address, port, ticket_type, num_tickets)
+
+    for ticket in tickets:
+        print(ticket)
+
+if __name__ == "__main__":
+    main()
+```
+
+Now, you can test Prototype C by running the `prototype_c_server.py` and `prototype_c_client.py` files using your preferred method. Please let me know if everything works as expected, and we can proceed with developing Prototype D.
