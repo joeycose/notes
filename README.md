@@ -1,4 +1,4 @@
-I apologize for the confusion in my previous response. Below are the complete `prototype_c_server.py` and `prototype_c_client.py` files:
+
 
 **prototype_c_server.py:**
 
