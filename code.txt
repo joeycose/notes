@@ -1,56 +1,36 @@
-import random
-import socket
-
-class LotteryTicketGenerator:
-    def __init__(self, ticket_type):
-        self.ticket_type = ticket_type
-        self.number_pool = self._initialize_number_pool()
-
-    def _initialize_number_pool(self):
-        if self.ticket_type == "type1":
-            return list(range(1, 50))
-        elif self.ticket_type == "type2":
-            return list(range(1, 41))
-        elif self.ticket_type == "type3":
-            return list(range(1, 60))
-
-    def generate_ticket(self):
-        ticket = []
-        pool = self.number_pool.copy()
-        for _ in range(6):
-            index = random.randint(0, len(pool) - 1)
-            number = pool.pop(index)
-            ticket.append(number)
-        return sorted(ticket)
-
-def generate_ticket(ticket_type):
-    generator = LotteryTicketGenerator(ticket_type)
-    ticket = generator.generate_ticket()
-    return ",".join(str(num) for num in ticket) + "\n"
-
-def serve_forever(port):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind(("0.0.0.0", port))
-    server.listen(5)
-
-    print(f"Server is listening at port {port}...")
-
-    while True:
-        conn, addr = server.accept()
-        print(f"New client connected: {addr}")
-
-        ticket_type = conn.recv(1024).decode("utf-8").strip()
-        ticket = generate_ticket(ticket_type)
-
-        conn.send(ticket.encode("utf-8"))
-
-        conn.close()
-        print(f"Client disconnected: {addr}")
-
-def main():
-    fixed_port = 9999  # Fixed port number where the server will listen
-    serve_forever(fixed_port)
-
-if __name__ == "__main__":
-    main()
+#==============================================================================
+ #   Assignment:  Milestone 1 
+ #
+ #       Author:  Giuseppe Cosentino 
+ #     Language:  Python3
+ #   To Compile:  Interpreted, not compiled. 
+ #
+ #        Class:  Professor Harvey Kaduri - DPI912 Python: Sockets and Security. 
+ #    Professor:  Professor Harvey Kaduri
+ #     Due Date:  May 26, 2023
+ #    Submitted:  May 26, 2023. 
+ #
+ #-----------------------------------------------------------------------------
+ #
+ #  Description:  DESCRIBE THE PROBLEM THAT THIS PROGRAM WAS WRITTEN TO
+ #      SOLVE.
+ #
+ #Collaboration:  WHOM YOU COLLABORATED WITH (FOR TRANSPARENCY)
+ #
+ #        Input:  DESCRIBE THE INPUT THAT THE PROGRAM REQUIRES.
+ #
+ #       Output:  DESCRIBE THE OUTPUT THAT THE PROGRAM PRODUCES.
+ #
+ #    Algorithm:  OUTLINE THE APPROACH USED BY THE PROGRAM TO SOLVE THE
+ #      PROBLEM.
+ #
+ #   Required Features Not Included:  DESCRIBE HERE ANY REQUIREMENTS OF
+ #      THE ASSIGNMENT THAT THE PROGRAM DOES NOT ATTEMPT TO SOLVE OR
+ #      IS UNSUCCESSFUL IN SOLVING.
+ #
+ #   Known Bugs:  IF THE PROGRAM DOES NOT FUNCTION CORRECTLY IN SOME
+ #      SITUATIONS, DESCRIBE THE SITUATIONS AND PROBLEMS HERE.
+ #
+ #   Classification: If applicable, which classification are you attempting
+ #
+#==============================================================================
