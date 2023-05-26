@@ -1,13 +1,31 @@
-New client connected: ('127.0.0.1', 43800)
-Traceback (most recent call last):
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_b_server.py", line 56, in <module>
+import socket
+
+def request_ticket(ipv4_address, port, ticket_type, num_tickets):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ipv4_address, port))
+
+    client.send(f"{ticket_type} {num_tickets}".encode("utf-8"))
+
+    tickets = []
+    for _ in range(num_tickets):
+        ticket = client.recv(1024).decode("utf-8")
+        tickets.append(ticket)
+
+    client.close()
+
+    return tickets
+
+def main():
+    # Hard-coded arguments
+    ipv4_address = "127.0.0.1"
+    port = 9999
+    ticket_type = "type1"
+    num_tickets = 5
+
+    tickets = request_ticket(ipv4_address, port, ticket_type, num_tickets)
+
+    for ticket in tickets:
+        print(ticket)
+
+if __name__ == "__main__":
     main()
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_b_server.py", line 53, in main
-    serve_forever(port)
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_b_server.py", line 44, in serve_forever
-    ticket = generate_ticket(ticket_type)
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_b_server.py", line 28, in generate_ticket
-    ticket = generator.generate_ticket()
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_b_server.py", line 19, in generate_ticket
-    pool = self.number_pool.copy()
-AttributeError: 'NoneType' object has no attribute 'copy'
