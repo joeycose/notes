@@ -1,61 +1,6 @@
-I apologize for the confusion. To accommodate your requested changes, I've updated both the client and server code to include the `-s` or `--sets` option for specifying the number of sets you want, and added connection and disconnection notifications for the server.
+To implement the specified requirements and changes for Prototype C, I have created the server and client files using the provided details and your previous request for adding `-s` or `--sets` option and connection/disconnection notifications.
 
-**For prototype_b_client.py:**
-
-```python
-#!/usr/bin/env python3
-
-import argparse
-import socket
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Lottery Ticket Client")
-    parser.add_argument("ipv4_address", help="IPv4 address of the server")
-    parser.add_argument("port", type=int, help="TCP port where the server is listening")
-    parser.add_argument("-t", "--ticket_type", choices=[
-                        "LOTTO_MAX", "LOTTO_6/49", "LOTTARIO"], required=True, help="Type of lottery ticket to generate")
-    parser.add_argument("-n", "--num_tickets", type=int, default=1, help="Number of tickets to request")
-    parser.add_argument("-s", "--sets", type=int, default=1, help="Number of sets to request")
-    args = parser.parse_args()
-
-    if not (1 <= args.port <= 65535):
-        parser.error("Invalid port number")
-
-    return args
-
-
-def request_ticket(ipv4_address, port, ticket_type, num_tickets, sets):
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((ipv4_address, port))
-
-    client.send(f"{ticket_type} {num_tickets} {sets}".encode("utf-8"))
-
-    ticket = client.recv(1024).decode("utf-8")
-
-    client.close()
-
-    return ticket
-
-
-def main():
-    args = parse_arguments()
-    ipv4_address = args.ipv4_address
-    port = args.port
-    ticket_type = args.ticket_type
-    num_tickets = args.num_tickets
-    sets = args.sets
-
-    ticket = request_ticket(ipv4_address, port, ticket_type, num_tickets, sets)
-
-    print(ticket)
-
-
-if __name__ == "__main__":
-    main()
-```
-
-**For prototype_b_server.py:**
+**For prototype_c_server.py:**
 
 ```python
 #!/usr/bin/env python3
@@ -124,20 +69,51 @@ def serve_forever(port):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Lottery Ticket Server")
-    parser.add_argument("port", type=int, help="TCP port where the server will listen")
-    args = parser.parse_args()
-
-    if not (1 <= args.port <= 65535):
-        parser.error("Invalid port number")
-
-    serve_forever(args.port)
+    fixed_port = 9999
+    serve_forever(fixed_port)
 
 
 if __name__ == "__main__":
     main()
 ```
 
-Please replace both the client and server files with the updated code provided above. This code should now accommodate the `-s` or `--sets` option in the client and notify the server of new connections and disconnections.
+**For prototype_c_client.py:**
 
-Let me know if you have any questions, or if you need any further assistance with these changes.
+```python
+#!/usr/bin/env python3
+
+import socket
+
+
+def request_ticket(ipv4_address, port, ticket_type, num_tickets, sets):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ipv4_address, port))
+
+    client.send(f"{ticket_type} {num_tickets} {sets}".encode("utf-8"))
+
+    ticket = client.recv(1024).decode("utf-8")
+
+    client.close()
+
+    return ticket
+
+
+def main():
+    ipv4_address = "127.0.0.1"
+    port = 9999
+    ticket_type = "LOTTO_MAX"
+    num_tickets = 1
+    sets = 3
+
+    ticket = request_ticket(ipv4_address, port, ticket_type, num_tickets, sets)
+
+    print(ticket)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+In this implementation, the server listens on the fixed port `9999` and displays notifications in the console when a client connects/disconnects. The client has hardcoded arguments for the IPv4 address, port, ticket type, number of tickets, and sets. It sends the request with these arguments to the server and prints the generated tickets.
+
+You can test the `prototype_c_server.py` and `prototype_c_client.py` the same way as the previous prototypes. Run the server first, then run the client.
