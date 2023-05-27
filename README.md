@@ -1,14 +1,12 @@
-For Prototype D, the requirements indicate that we should use a blocking daemon on a fixed socket with IPv4, and Telnet should be used as the client. We'll modify the `prototype_d_server.py` script to handle the new lottery ticket types as well as provide logging for connecting and disconnecting clients. However, we won't create a new `prototype_d_client.py` as we'll be using Telnet as our client instead.
-
-Here's the code for `prototype_d_server.py`:
+Apologies for the confusion. Here's the entire server code that can handle both IPv4 and IPv6:
 
 ```python
 #!/usr/bin/env python3
-
 import argparse
+import os
 import random
 import socket
-
+import sys
 
 class LotteryTicketGenerator:
 
@@ -33,67 +31,60 @@ class LotteryTicketGenerator:
             ticket.append(number)
         return sorted(ticket)
 
-
 def generate_ticket(ticket_type):
     generator = LotteryTicketGenerator(ticket_type)
     return generator.generate_ticket()
 
+def serve_client(conn, addr):
+    print("Connection from", addr)
+    recv_data = conn.recv(1024).decode("utf-8").strip().split()
+    if len(recv_data) == 2:
+        ticket_type, num_tickets = recv_data
+    else:
+        ticket_type, num_tickets, sets = recv_data
+    num_tickets = int(num_tickets)
 
-def serve_forever(port):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    tickets = []
+    for _ in range(num_tickets):
+        ticket = generate_ticket(ticket_type)
+        tickets.append(" ".join(map(str, ticket)))
+
+    response = "\n".join(tickets)
+    conn.send(response.encode("utf-8"))
+    conn.close()
+    print("Disconnected from", addr)
+    sys.exit(0)
+
+def main(port):
+    server = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind(("0.0.0.0", port))
+    server.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+    server.bind(("::", port))
     server.listen(5)
 
     print("Server is serving on port", port)
 
     while True:
-        conn, addr = server.accept()
-        print("Connection from", addr)
+        try:
+            conn, addr = server.accept()
+        except KeyboardInterrupt:
+            break
+        except:
+            continue
 
-        recv_data = conn.recv(1024).decode("utf-8").strip()
-        ticket_type, num_tickets, sets = recv_data.split()
-        num_tickets = int(num_tickets)
-        sets = int(sets)
+        pid = os.fork()
+        if pid == 0:
+            server.close()
+            serve_client(conn, addr)
+        else:
+            conn.close()
 
-        tickets = []
-        for _ in range(num_tickets * sets):
-            ticket = generate_ticket(ticket_type)
-            tickets.append(" ".join(map(str, ticket)))
-
-        response = "\n".join(tickets)
-        conn.send(response.encode("utf-8"))
-
-        conn.close()
-        print("Disconnected from", addr)
-
-
-def main():
-    fixed_port = 9999
-    serve_forever(fixed_port)
-
+    print("Shutting down the server...")
+    server.close()
 
 if __name__ == "__main__":
-    main()
+    fixed_port = 9999
+    main(fixed_port)
 ```
 
-**Testing with Telnet as the client:**
-
-1. Run the `prototype_d_server.py` script first. It will start the server which listens for connections.
-2. Open a terminal and type the following command to connect to the server using Telnet:
-
-```
-telnet 127.0.0.1 9999
-```
-
-Replace `127.0.0.1` with the server's IPv4 address if running the server on a different machine.
-
-3. After connecting, you can enter the ticket_type, num_tickets, and sets separated by spaces, e.g:
-
-```
-LOTTO_MAX 1 3
-```
-
-Press Enter, and you'll get the requested tickets in response. The server will also log connection and disconnection events in the terminal where it's running.
-
-4. Type `^]` (Ctrl + ]) followed by the `quit` command to exit the Telnet client.
+This server code will accept connections for both IPv4 and IPv6 clients, allowing you to test all prototypes without changing the server code. Remember to adjust the client scripts for each prototype accordingly to ensure they're using the correct IP versions (IPv4 or IPv6) as specified in the requirements.
