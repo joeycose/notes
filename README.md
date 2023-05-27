@@ -1,6 +1,6 @@
-To implement the specified requirements and changes for Prototype C, I have created the server and client files using the provided details and your previous request for adding `-s` or `--sets` option and connection/disconnection notifications.
+For Prototype D, the requirements indicate that we should use a blocking daemon on a fixed socket with IPv4, and Telnet should be used as the client. We'll modify the `prototype_d_server.py` script to handle the new lottery ticket types as well as provide logging for connecting and disconnecting clients. However, we won't create a new `prototype_d_client.py` as we'll be using Telnet as our client instead.
 
-**For prototype_c_server.py:**
+Here's the code for `prototype_d_server.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -77,43 +77,23 @@ if __name__ == "__main__":
     main()
 ```
 
-**For prototype_c_client.py:**
+**Testing with Telnet as the client:**
 
-```python
-#!/usr/bin/env python3
+1. Run the `prototype_d_server.py` script first. It will start the server which listens for connections.
+2. Open a terminal and type the following command to connect to the server using Telnet:
 
-import socket
-
-
-def request_ticket(ipv4_address, port, ticket_type, num_tickets, sets):
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((ipv4_address, port))
-
-    client.send(f"{ticket_type} {num_tickets} {sets}".encode("utf-8"))
-
-    ticket = client.recv(1024).decode("utf-8")
-
-    client.close()
-
-    return ticket
-
-
-def main():
-    ipv4_address = "127.0.0.1"
-    port = 9999
-    ticket_type = "LOTTO_MAX"
-    num_tickets = 1
-    sets = 3
-
-    ticket = request_ticket(ipv4_address, port, ticket_type, num_tickets, sets)
-
-    print(ticket)
-
-
-if __name__ == "__main__":
-    main()
+```
+telnet 127.0.0.1 9999
 ```
 
-In this implementation, the server listens on the fixed port `9999` and displays notifications in the console when a client connects/disconnects. The client has hardcoded arguments for the IPv4 address, port, ticket type, number of tickets, and sets. It sends the request with these arguments to the server and prints the generated tickets.
+Replace `127.0.0.1` with the server's IPv4 address if running the server on a different machine.
 
-You can test the `prototype_c_server.py` and `prototype_c_client.py` the same way as the previous prototypes. Run the server first, then run the client.
+3. After connecting, you can enter the ticket_type, num_tickets, and sets separated by spaces, e.g:
+
+```
+LOTTO_MAX 1 3
+```
+
+Press Enter, and you'll get the requested tickets in response. The server will also log connection and disconnection events in the terminal where it's running.
+
+4. Type `^]` (Ctrl + ]) followed by the `quit` command to exit the Telnet client.
