@@ -1,1 +1,3 @@
-python client.py ::1 9999 -t LOTTO_MAX -s 3
+usage: main.py [-h] -t {LOTTO_MAX,LOTTO_6/49,LOTTARIO} [-s SETS]
+               ipv6_address port
+main.py: error: argument port: invalid int value: 'main.py'
