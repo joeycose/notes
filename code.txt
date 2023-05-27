@@ -1,3 +1,12 @@
-usage: main.py [-h] -t {LOTTO_MAX,LOTTO_6/49,LOTTARIO} [-s SETS]
-               ipv6_address port
-main.py: error: argument port: invalid int value: 'main.py'
+def main():
+    args = parse_arguments()
+    ipv6_address = args.ipv6_address
+    port = args.port
+    ticket_type = args.ticket_type
+    sets = args.sets
+
+    for _ in range(sets):
+        ticket = request_ticket(ipv6_address, port, ticket_type)
+        ticket_numbers = ticket.strip().split(',')
+        ticket_array = f"[{', '.join(ticket_numbers)}]"
+        print(ticket_array)
