@@ -1,12 +1,6 @@
-def main():
-    args = parse_arguments()
-    ipv6_address = args.ipv6_address
-    port = args.port
-    ticket_type = args.ticket_type
-    sets = args.sets
-
-    for _ in range(sets):
-        ticket = request_ticket(ipv6_address, port, ticket_type)
-        ticket_numbers = ticket.strip().split(',')
-        ticket_array = f"[{', '.join(ticket_numbers)}]"
-        print(ticket_array)
+Traceback (most recent call last):
+  File "/home/lab/sandbox/DPI912/src/m1/test/main.py", line 44, in <module>
+    main()
+  File "/home/lab/sandbox/DPI912/src/m1/test/main.py", line 38, in main
+    ticket = request_ticket(ipv6_address, port, ticket_type)
+TypeError: request_ticket() missing 1 required positional argument: 'sets'
