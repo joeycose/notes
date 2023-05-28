@@ -1,4 +1,4 @@
-Apologies for the confusion. Here's the entire server code that can handle both IPv4 and IPv6:
+
 
 ```python
 #!/usr/bin/env python3
