@@ -1,8 +1,1 @@
-Traceback (most recent call last):
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_d_server.py", line 71, in <module>
-    main()
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_d_server.py", line 67, in main
-    serve_forever(fixed_port)
-  File "/home/lab/sandbox/DPI912/src/m1/prototype_d_server.py", line 39, in serve_forever
-    server.bind(("0.0.0.0", port))
-OSError: [Errno 98] Address already in use
+
