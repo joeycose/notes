@@ -87,4 +87,4 @@ if __name__ == "__main__":
     main(fixed_port)
 ```
 
-This server code will accept connections for both IPv4 and IPv6 clients, allowing you to test all prototypes without changing the server code. Remember to adjust the client scripts for each prototype accordingly to ensure they're using the correct IP versions (IPv4 or IPv6) as specified in the requirements.
+This server code will accept connections for both IPv4 and IPv6 clients, allowing you to test all prototypes without changing the server code. Remember to adjust the client scripts for each prototype accordingly to ensure they're using the correct IP versions (IPv4 or IPv6) as specified in the requirements. Check requirements if server does not start. 
